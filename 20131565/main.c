@@ -44,7 +44,7 @@ struct bitmap
     elem_type *bits;
 };
 
-// cmp func
+// hash, less, action func
 unsigned hash_hash_int_func (const struct hash_elem *e, void *aux)
 {
     struct hash_item *p = hash_entry(e, struct hash_item, elem);
@@ -68,6 +68,16 @@ void destruct_hash_func (struct hash_elem *e, void *aux)
 {
     struct hash_item *p = hash_entry(e, struct hash_item, elem);
     free(p);
+}
+void square_hash_func (struct hash_elem *e, void *aux)
+{
+    struct hash_item *p = hash_entry(e, struct hash_item, elem);
+    p->data = p->data * p->data;
+}
+void triple_hash_func (struct hash_elem *e, void *aux)
+{
+    struct hash_item *p = hash_entry(e, struct hash_item, elem);
+    p->data = p->data * p->data * p->data;
 }
 
 // ex func
@@ -113,9 +123,7 @@ int find_struct_by_name (char name_list[MAX_NUM][MAX_LEN], char name[MAX_LEN])
     int name_idx;
     for(name_idx = 0; name_idx < MAX_NUM; name_idx++)
         if(strcmp(name_list[name_idx], name) == 0) return name_idx;
-    name_idx = NOT_FOUND;
-    ASSERT(name_idx != NOT_FOUND);
-    return name_idx;
+    return NOT_FOUND;
 }
 struct list_elem *list_elem_at (struct list *list, int idx)
 {
@@ -374,39 +382,61 @@ int main()
             }
             else if(strcmp(token[0], "hash_insert") == 0)
             {
-
+                int data = atoi(token[2]);
+                struct hash_item *item = (struct hash_item*)malloc(sizeof(struct hash_item));
+                item->data = data;
+                hash_insert(&my_hash[idx], &item->elem);
             }
             else if(strcmp(token[0], "hash_replace") == 0)
             {
-
+                int data = atoi(token[2]);
+                struct hash_item *item = (struct hash_item*)malloc(sizeof(struct hash_item));
+                item->data = data;
+                struct hash_elem *it = hash_replace(&my_hash[idx], &item->elem);
+                if(it != NULL) free(it);
             }
             else if(strcmp(token[0], "hash_find") == 0)
             {
-
+                struct hash_item item;
+                item.data = atoi(token[2]);
+                struct hash_elem *it = hash_find(&my_hash[idx], &item.elem);
+                if(it != NULL) printf("%d\n", item.data);
             }
             else if(strcmp(token[0], "hash_delete") == 0)
             {
-
+                struct hash_item item;
+                item.data = atoi(token[2]);
+                struct hash_elem *it = hash_delete(&my_hash[idx], &item.elem);
+                if(it != NULL)
+                {
+                    struct hash_item *p = hash_entry(it, struct hash_item, elem);
+                    free(p);
+                }
             }
             else if(strcmp(token[0], "hash_clear") == 0)
             {
-
+                hash_clear(&my_hash[idx], destruct_hash_func);
             }
             else if(strcmp(token[0], "hash_size") == 0)
             {
-
+                printf("%d\n", hash_size(&my_hash[idx]));
             }
             else if(strcmp(token[0], "hash_empty") == 0)
             {
-
+                if(hash_empty(&my_hash[idx])) printf("true\n");
+                else printf("false\n");
             }
             else if(strcmp(token[0], "hash_apply") == 0)
             {
-
+                if(strcmp(token[2], "square") == 0)
+                    hash_apply(&my_hash[idx], square_hash_func);
+                else if(strcmp(token[2], "triple") == 0)
+                    hash_apply(&my_hash[idx], triple_hash_func);
             }
             else if(strcmp(token[0], "hash_int_2") == 0)
             {
-
+                int data = atoi(token[2]);
+                printf("%d\n", hash_int_2(data));
             }
             else if(strcmp(token[0], "bitmap_size") == 0)
             {
