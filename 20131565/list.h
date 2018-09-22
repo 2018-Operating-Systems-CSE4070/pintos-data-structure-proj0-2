@@ -165,4 +165,8 @@ void list_unique (struct list *, struct list *duplicates,
 struct list_elem *list_max (struct list *, list_less_func *, void *aux);
 struct list_elem *list_min (struct list *, list_less_func *, void *aux);
 
+/* etc */
+void list_swap (struct list_elem *a, struct list_elem *b);
+void list_shuffle (struct list *list);
+
 #endif /* lib/kernel/list.h */

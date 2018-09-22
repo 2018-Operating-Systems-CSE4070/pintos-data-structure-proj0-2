@@ -38,11 +38,6 @@ struct hash_item
     struct hash_elem elem;
     int data;
 };
-struct bitmap
-{
-    size_t bit_cnt;
-    elem_type *bits;
-};
 
 // hash, less, action func
 unsigned hash_hash_int_func (const struct hash_elem *e, void *aux)
@@ -78,32 +73,6 @@ void triple_hash_func (struct hash_elem *e, void *aux)
 {
     struct hash_item *p = hash_entry(e, struct hash_item, elem);
     p->data = p->data * p->data * p->data;
-}
-
-// ex func
-void list_swap (struct list_elem *a, struct list_elem *b)
-{
-    struct list_elem *a_perv, *a_next;
-    struct list_elem *b_prev, *b_next;
-
-    a_perv = a->prev; a_next = a->next;
-    b_prev = b->prev; b_next = b->next;
-    a_perv->next = b; a_next->prev = b;
-    b_prev->next = a; b_next->prev = a;
-    a->prev = b_prev; a->next = b_next;
-    b->prev = a_perv; b->next = a_next;
-}
-void list_shuffle (struct list *list)
-{
-
-}
-unsigned hash_int_2 (int i)
-{
-
-}
-struct bitmap *bitmap_expand (struct bitmap *bitmap, int size)
-{
-
 }
 
 // util func
@@ -236,7 +205,7 @@ int main()
             if(t == BITMAP)
             {
                 unsigned int i;
-                for(i = 0; i < my_bitmap[idx]->bit_cnt; i++)
+                for(i = 0; i < bitmap_size(my_bitmap[idx]); i++)
                     printf("%d", bitmap_test(my_bitmap[idx], i));
                 printf("\n");
             }
@@ -440,71 +409,109 @@ int main()
             }
             else if(strcmp(token[0], "bitmap_size") == 0)
             {
-
+                printf("%d\n", bitmap_size(my_bitmap[idx]));
             }
             else if(strcmp(token[0], "bitmap_set") == 0)
             {
-
+                int jdx = atoi(token[2]);
+                if(strcmp(token[3], "true") == 0) bitmap_set(my_bitmap[idx], jdx, true);
+                else bitmap_set(my_bitmap[idx], jdx, false);
             }
             else if(strcmp(token[0], "bitmap_mark") == 0)
             {
-
+                int jdx = atoi(token[2]);
+                bitmap_mark(my_bitmap[idx], jdx);
             }
             else if(strcmp(token[0], "bitmap_reset") == 0)
             {
-
+                int jdx = atoi(token[2]);
+                bitmap_reset(my_bitmap[idx], jdx);
             }
             else if(strcmp(token[0], "bitmap_flip") == 0)
             {
-
+                int jdx = atoi(token[2]);
+                bitmap_flip(my_bitmap[idx], jdx);
             }
             else if(strcmp(token[0], "bitmap_test") == 0)
             {
-
+                int jdx = atoi(token[2]);
+                if(bitmap_test(my_bitmap[idx], jdx)) printf("true\n");
+                else printf("false\n");
             }
             else if(strcmp(token[0], "bitmap_set_all") == 0)
             {
-
+                bool value;
+                if(strcmp(token[2], "true") == 0) value = true;
+                else value = false;
+                bitmap_set_all(my_bitmap[idx], value);
             }
             else if(strcmp(token[0], "bitmap_set_multiple") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                bool value;
+                if(strcmp(token[4], "true") == 0) value = true;
+                else value = false;
+                bitmap_set_multiple(my_bitmap[idx], start, cnt, value);
             }
             else if(strcmp(token[0], "bitmap_count") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                bool value;
+                if(strcmp(token[4], "true") == 0) value = true;
+                else value = false;
+                printf("%d\n", bitmap_count(my_bitmap[idx], start, cnt, value));
             }
             else if(strcmp(token[0], "bitmap_contains") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                bool value;
+                if(strcmp(token[4], "true") == 0) value = true;
+                else value = false;
+                if(bitmap_contains(my_bitmap[idx], start, cnt, value)) printf("true\n");
+                else printf("false\n");
             }
             else if(strcmp(token[0], "bitmap_any") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                if(bitmap_any(my_bitmap[idx], start, cnt)) printf("true\n");
+                else printf("false\n");
             }
             else if(strcmp(token[0], "bitmap_none") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                if(bitmap_none(my_bitmap[idx], start, cnt)) printf("true\n");
+                else printf("false\n");
             }
             else if(strcmp(token[0], "bitmap_all") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                if(bitmap_all(my_bitmap[idx], start, cnt)) printf("true\n");
+                else printf("false\n");
             }
             else if(strcmp(token[0], "bitmap_scan") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                bool value;
+                if(strcmp(token[4], "true") == 0) value = true;
+                else value = false;
+                printf("%u\n", bitmap_scan(my_bitmap[idx], start, cnt, value));
             }
             else if(strcmp(token[0], "bitmap_scan_and_flip") == 0)
             {
-
+                int start = atoi(token[2]), cnt = atoi(token[3]);
+                bool value;
+                if(strcmp(token[4], "true") == 0) value = true;
+                else value = false;
+                printf("%u\n", bitmap_scan_and_flip(my_bitmap[idx], start, cnt, value));
             }
             else if(strcmp(token[0], "bitmap_dump") == 0)
             {
-
+                bitmap_dump(my_bitmap[idx]);
             }
             else if(strcmp(token[0], "bitmap_expand") == 0)
             {
-
+                int size = atoi(token[2]);
+                bitmap_expand(my_bitmap[idx], size);
             }
         }
     }
