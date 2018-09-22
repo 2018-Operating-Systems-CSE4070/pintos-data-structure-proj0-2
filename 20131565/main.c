@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
 #include "list.h"
 #include "hash.h"
 #include "bitmap.h"
@@ -9,13 +10,11 @@
 #define ASSERT(CONDITION) assert(CONDITION)
 #define MAX_NUM 21
 #define MAX_LEN 41
-#define TOKEN_NUM 10
+#define TOKEN_NUM 6
 #define LIST 0
 #define HASH 1
 #define BITMAP 2
 #define NOT_FOUND -1
-
-typedef unsigned long elem_type;
 
 char buff[251];
 char token[TOKEN_NUM][MAX_LEN];
@@ -28,7 +27,6 @@ struct list my_list[MAX_NUM];
 struct hash my_hash[MAX_NUM];
 struct bitmap *my_bitmap[MAX_NUM];
 
-// items
 struct list_item
 {
     struct list_elem elem;
@@ -40,7 +38,6 @@ struct hash_item
     int data;
 };
 
-// hash, less, action func
 unsigned hash_hash_int_func (const struct hash_elem *e, void *aux)
 {
     struct hash_item *p = hash_entry(e, struct hash_item, elem);
@@ -76,7 +73,6 @@ void triple_hash_func (struct hash_elem *e, void *aux)
     p->data = p->data * p->data * p->data;
 }
 
-// new func
 void list_swap (struct list_elem *a, struct list_elem *b)
 {
     struct list_item *pa = list_entry(a, struct list_item, elem);
@@ -161,10 +157,8 @@ int main()
     while(1)
     {
         int token_cnt, aux = 0;
-
         fgets(buff, sizeof(buff), stdin);
-        token_cnt = sscanf(buff, "%s %s %s %s %s %s %s %s %s %s", 
-        token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9]);
+        token_cnt = sscanf(buff, "%s %s %s %s %s %s", token[0], token[1], token[2], token[3], token[4], token[5]);
 
         if(strcmp(token[0], "create") == 0)
         {
@@ -191,7 +185,6 @@ int main()
         {
             int t, idx;
             find_by_name(token[1], &t, &idx);
-            ASSERT(idx != NOT_FOUND);
 
             if(t == LIST)
             {
@@ -218,7 +211,6 @@ int main()
         {
             int t, idx;
             find_by_name(token[1], &t, &idx);
-            ASSERT(idx != NOT_FOUND);
 
             if(t == LIST)
             {
@@ -259,7 +251,6 @@ int main()
         {
             int t, idx;
             find_by_name(token[1], &t, &idx);
-            ASSERT(idx != NOT_FOUND);
 
             if(strcmp(token[0], "list_insert") == 0)
             {
