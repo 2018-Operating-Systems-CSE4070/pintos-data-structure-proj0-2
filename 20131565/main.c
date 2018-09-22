@@ -28,6 +28,7 @@ struct list my_list[MAX_NUM];
 struct hash my_hash[MAX_NUM];
 struct bitmap *my_bitmap[MAX_NUM];
 
+// items
 struct list_item
 {
     struct list_elem elem;
@@ -73,6 +74,44 @@ void triple_hash_func (struct hash_elem *e, void *aux)
 {
     struct hash_item *p = hash_entry(e, struct hash_item, elem);
     p->data = p->data * p->data * p->data;
+}
+
+// new func
+void list_swap (struct list_elem *a, struct list_elem *b)
+{
+    struct list_item *pa = list_entry(a, struct list_item, elem);
+    struct list_item *pb = list_entry(b, struct list_item, elem);
+    int data_tmp = pa->data;
+    pa->data = pb->data;
+    pb->data = data_tmp;
+}
+void list_shuffle (struct list *list)
+{
+    unsigned int i, j, size = list_size(list);
+    srand((unsigned)time(NULL));
+    for(i = 0; i < size * 10; i++)
+    { 
+        unsigned idx_a = (unsigned)rand() % size;
+        unsigned idx_b = (unsigned)rand() % size;
+        struct list_elem *it_a, *it_b;
+        for(it_a = list_begin(list), j = 0; it_a != list_end(list) && j < idx_a; it_a = list_next(it_a), j++);
+        for(it_b = list_begin(list), j = 0; it_b != list_end(list) && j < idx_b; it_b = list_next(it_b), j++);
+        list_swap(it_a, it_b);
+    }
+}
+unsigned hash_int_2 (int i)
+{
+    unsigned hash = i * 2654435761;
+    return hash;
+}
+struct bitmap *bitmap_expand (struct bitmap *bitmap, int size)
+{
+    unsigned int i, bitmap_sz = bitmap_size(bitmap);
+    struct bitmap *nbitmap = bitmap_create(bitmap_sz + size);
+    for(i = 0; i < bitmap_sz; i++)
+        bitmap_set(nbitmap, i, bitmap_test(bitmap, i));
+    bitmap_destroy(bitmap);
+    return nbitmap;
 }
 
 // util func
@@ -204,13 +243,18 @@ int main()
             }
             if(t == BITMAP)
             {
-                unsigned int i;
-                for(i = 0; i < bitmap_size(my_bitmap[idx]); i++)
+                unsigned int i, bitmap_sz = bitmap_size(my_bitmap[idx]);
+                for(i = 0; i < bitmap_sz; i++)
                     printf("%d", bitmap_test(my_bitmap[idx], i));
                 printf("\n");
             }
         }
         else if(strcmp(token[0], "quit") == 0) break;
+        else if(strcmp(token[0], "hash_int_2") == 0)
+        {
+            int data = atoi(token[1]);
+            printf("%d\n", hash_int_2(data));
+        }
         else
         {
             int t, idx;
@@ -402,11 +446,6 @@ int main()
                 else if(strcmp(token[2], "triple") == 0)
                     hash_apply(&my_hash[idx], triple_hash_func);
             }
-            else if(strcmp(token[0], "hash_int_2") == 0)
-            {
-                int data = atoi(token[2]);
-                printf("%d\n", hash_int_2(data));
-            }
             else if(strcmp(token[0], "bitmap_size") == 0)
             {
                 printf("%d\n", bitmap_size(my_bitmap[idx]));
@@ -511,8 +550,9 @@ int main()
             else if(strcmp(token[0], "bitmap_expand") == 0)
             {
                 int size = atoi(token[2]);
-                bitmap_expand(my_bitmap[idx], size);
+                my_bitmap[idx] = bitmap_expand(my_bitmap[idx], size);
             }
+            else break;
         }
     }
     return 0;

@@ -531,22 +531,3 @@ list_min (struct list *list, list_less_func *less, void *aux)
     }
   return min;
 }
-
-/* etc */
-void list_swap (struct list_elem *a, struct list_elem *b)
-{
-    struct list_elem *a_perv, *a_next;
-    struct list_elem *b_prev, *b_next;
-
-    a_perv = a->prev; a_next = a->next;
-    b_prev = b->prev; b_next = b->next;
-    a_perv->next = b; a_next->prev = b;
-    b_prev->next = a; b_next->prev = a;
-    a->prev = b_prev; a->next = b_next;
-    b->prev = a_perv; b->next = a_next;
-}
-
-void list_shuffle (struct list *list)
-{
-
-}
