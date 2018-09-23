@@ -111,25 +111,25 @@ struct bitmap *bitmap_expand (struct bitmap *bitmap, int size)
 }
 
 // util func
-void find_by_name (char name[MAX_LEN], int *t, int *idx)
+void find_type_idx_by_name (char name[MAX_LEN], int *t, int *idx)
 {
-    int name_idx;
-    name_idx = find_struct_by_name(list_name, name);
-    if(name_idx != NOT_FOUND){*t = LIST, *idx = name_idx; return;}
-    name_idx = find_struct_by_name(hash_name, name);
-    if(name_idx != NOT_FOUND){*t = HASH, *idx = name_idx; return;}
-    name_idx = find_struct_by_name(bitmap_name, name);
-    if(name_idx != NOT_FOUND){*t = BITMAP, *idx = name_idx; return;}
-    ASSERT(name_idx != NOT_FOUND);
+    int idx_name;
+    idx_name = find_idx_by_name(list_name, name);
+    if(idx_name != NOT_FOUND){*t = LIST, *idx = idx_name; return;}
+    idx_name = find_idx_by_name(hash_name, name);
+    if(idx_name != NOT_FOUND){*t = HASH, *idx = idx_name; return;}
+    idx_name = find_idx_by_name(bitmap_name, name);
+    if(idx_name != NOT_FOUND){*t = BITMAP, *idx = idx_name; return;}
+    ASSERT(idx_name != NOT_FOUND);
 }
-int find_struct_by_name (char name_list[MAX_NUM][MAX_LEN], char name[MAX_LEN])
+int find_idx_by_name (char name_list[MAX_NUM][MAX_LEN], char name[MAX_LEN])
 {
-    int name_idx;
-    for(name_idx = 0; name_idx < MAX_NUM; name_idx++)
-        if(strcmp(name_list[name_idx], name) == 0) return name_idx;
+    int idx_name;
+    for(idx_name = 0; idx_name < MAX_NUM; idx_name++)
+        if(strcmp(name_list[idx_name], name) == 0) return idx_name;
     return NOT_FOUND;
 }
-struct list_elem *list_elem_at (struct list *list, int idx)
+struct list_elem *find_elem_by_idx (struct list *list, int idx)
 {
     struct list_elem* it;
     int i;
@@ -184,7 +184,7 @@ int main()
         else if(strcmp(token[0], "delete") == 0)
         {
             int t, idx;
-            find_by_name(token[1], &t, &idx);
+            find_type_idx_by_name(token[1], &t, &idx);
 
             if(t == LIST)
             {
@@ -210,7 +210,7 @@ int main()
         else if(strcmp(token[0], "dumpdata") == 0)
         {
             int t, idx;
-            find_by_name(token[1], &t, &idx);
+            find_type_idx_by_name(token[1], &t, &idx);
 
             if(t == LIST)
             {
@@ -250,24 +250,24 @@ int main()
         else
         {
             int t, idx;
-            find_by_name(token[1], &t, &idx);
+            find_type_idx_by_name(token[1], &t, &idx);
 
             if(strcmp(token[0], "list_insert") == 0)
             {
                 int jdx = atoi(token[2]), data = atoi(token[3]);
                 struct list_item *item = (struct list_item*)malloc(sizeof(struct list_item));
                 item->data = data;
-                struct list_elem *it = list_elem_at(&my_list[idx], jdx);
+                struct list_elem *it = find_elem_by_idx(&my_list[idx], jdx);
                 list_insert(it, &item->elem);
             }
             else if(strcmp(token[0], "list_splice") == 0)
             {
                 int t2, idx2;
                 int jdx = atoi(token[2]), idx_a = atoi(token[4]), idx_b = atoi(token[5]);
-                find_by_name(token[3], &t2, &idx2);
-                struct list_elem *it = list_elem_at(&my_list[idx], jdx);
-                struct list_elem *it_a = list_elem_at(&my_list[idx2], idx_a);
-                struct list_elem *it_b = list_elem_at(&my_list[idx2], idx_b);
+                find_type_idx_by_name(token[3], &t2, &idx2);
+                struct list_elem *it = find_elem_by_idx(&my_list[idx], jdx);
+                struct list_elem *it_a = find_elem_by_idx(&my_list[idx2], idx_a);
+                struct list_elem *it_b = find_elem_by_idx(&my_list[idx2], idx_b);
                 list_splice(it, it_a, it_b);
             }
             else if(strcmp(token[0], "list_push_front") == 0)
@@ -287,7 +287,7 @@ int main()
             else if(strcmp(token[0], "list_remove") == 0)
             {
                 int jdx = atoi(token[2]);
-                struct list_elem *it = list_elem_at(&my_list[idx], jdx);
+                struct list_elem *it = find_elem_by_idx(&my_list[idx], jdx);
                 struct list_item *p = list_entry(it, struct list_item, elem);
                 list_remove(it);
                 free(p);
@@ -357,7 +357,7 @@ int main()
                 else if(token_cnt == 3)
                 {
                     int t2, idx2;
-                    find_by_name(token[2], &t2, &idx2);
+                    find_type_idx_by_name(token[2], &t2, &idx2);
                     list_unique(&my_list[idx], &my_list[idx2], less_list_int_func, &aux);
                 }
             }
@@ -376,8 +376,8 @@ int main()
             else if(strcmp(token[0], "list_swap") == 0)
             {
                 int idx_a = atoi(token[2]), idx_b = atoi(token[3]);
-                struct list_elem *a = list_elem_at(&my_list[idx], idx_a);
-                struct list_elem *b = list_elem_at(&my_list[idx], idx_b);
+                struct list_elem *a = find_elem_by_idx(&my_list[idx], idx_a);
+                struct list_elem *b = find_elem_by_idx(&my_list[idx], idx_b);
                 list_swap(a, b);
             }
             else if(strcmp(token[0], "list_shuffle") == 0)
